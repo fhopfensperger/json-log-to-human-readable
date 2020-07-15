@@ -128,10 +128,10 @@ func toHumanReadable(r io.Reader) error {
 		var logMessage LogMessage
 		err := json.Unmarshal(byteValue, &logMessage)
 		if err != nil {
-			fmt.Println("Could not decode line to json")
+			fmt.Println("Could not decode line to json", err)
 			continue
 		}
-		fmt.Printf("%v %v\t %v\n",logMessage.Level, logMessage.Timestamp, logMessage.Message)
+		logMessage.print()
 	}
 	return nil
 }
