@@ -27,6 +27,7 @@ import (
 	"os"
 )
 
+var version = "v0.0.2"
 var cfgFile string
 
 // rootCmd represents the base command when called without any subcommands
@@ -45,6 +46,7 @@ kubectl logs -f -n default pod-name-1 | json-log-to-human-readable`,
 			return runCommand()
 		},
 		Args: NoArgs,
+		Version: version,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
