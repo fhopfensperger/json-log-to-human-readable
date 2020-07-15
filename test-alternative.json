@@ -1,0 +1,1 @@
+{"@timestamp":"2020-07-15T19:09:39.983Z","@version":"1","message":"My log message","logger_name":"org.acme.MyClass","thread_name":"pool-1-thread-1","level":"INFO","level_value":20000}

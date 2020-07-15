@@ -27,14 +27,15 @@ import (
 	"os"
 )
 
-var version = "v0.0.2"
+var version = "v0.0.3"
 var cfgFile string
+var alternativeInput bool
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "json-log-to-human-readable",
-	Short: "Transforms json log message to human readable strings",
-	Long: `A simple command line utility to transform one line json log message to a human readable string For example:
+	Use:   "cat test.json | json-log-to-human-readable",
+	Short: "Transforms json log message to a human readable output",
+	Long: `A simple command line utility to transform one line json log message to a human readable output For example:
 
 content test.json: { "level": "INFO", "timestamp": "2020-07-14T09:38:14.977Z", "message": "sample output" }
 cat test.json | json-log-to-human-readable
@@ -42,11 +43,11 @@ tail -f test.json | json-log-to-human-readable
 kubectl logs -f -n default pod-name-1 | json-log-to-human-readable`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
-		RunE: func(cmd *cobra.Command, args []string) error{
-			return runCommand()
-		},
-		Args: NoArgs,
-		Version: version,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return runCommand()
+	},
+	Args:    NoArgs,
+	Version: version,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -69,7 +70,8 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	//rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.PersistentFlags().BoolVarP(&alternativeInput, "alternative", "a", false, "Spring Boot JSON input")
+
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -118,22 +120,33 @@ func runCommand() error {
 
 func isInputFromPipe() bool {
 	fileInfo, _ := os.Stdin.Stat()
-	return fileInfo.Mode() & os.ModeCharDevice == 0
+	return fileInfo.Mode()&os.ModeCharDevice == 0
 }
 
 func toHumanReadable(r io.Reader) error {
 	scanner := bufio.NewScanner(bufio.NewReader(r))
 	for scanner.Scan() {
-		byteValue:= scanner.Bytes()
+		byteValue := scanner.Bytes()
 
-		//var jsonFileContent json.RawMessage
-		var logMessage LogMessage
-		err := json.Unmarshal(byteValue, &logMessage)
-		if err != nil {
-			fmt.Println("Could not decode line to json", err)
-			continue
+		if alternativeInput {
+			var logMessage AlternativeLogMessage
+			err := json.Unmarshal(byteValue, &logMessage)
+			if err != nil {
+				fmt.Println(string(byteValue))
+				continue
+			}
+			logMessage.print()
+
+		} else {
+			var logMessage LogMessage
+			err := json.Unmarshal(byteValue, &logMessage)
+			if err != nil {
+				fmt.Println(string(byteValue))
+				continue
+			}
+			logMessage.print()
 		}
-		logMessage.print()
+
 	}
 	return nil
 }
