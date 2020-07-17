@@ -27,13 +27,15 @@ import (
 	"os"
 )
 
-var version = "v0.0.3"
+var (
+	version = "v0.0.0"
+)
 var cfgFile string
 var alternativeInput bool
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "cat test.json | json-log-to-human-readable",
+	Use:   "cat test-log.json | json-log-to-human-readable",
 	Short: "Transforms json log message to a human readable output",
 	Long: `A simple command line utility to transform one line json log message to a human readable output For example:
 
@@ -71,7 +73,7 @@ func init() {
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	rootCmd.PersistentFlags().BoolVarP(&alternativeInput, "alternative", "a", false, "Spring Boot JSON input")
-
+	rootCmd.SetVersionTemplate(`{{printf "%s\n" .Version}}`)
 }
 
 // initConfig reads in config file and ENV variables if set.
