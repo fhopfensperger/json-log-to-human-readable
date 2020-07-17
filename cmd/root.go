@@ -27,36 +27,35 @@ import (
 	"os"
 )
 
-var (
-	version = "v0.0.0"
-)
 var cfgFile string
 var alternativeInput bool
 
-// rootCmd represents the base command when called without any subcommands
-var rootCmd = &cobra.Command{
-	Use:   "cat test-log.json | json-log-to-human-readable",
-	Short: "Transforms json log message to a human readable output",
-	Long: `A simple command line utility to transform one line json log message to a human readable output For example:
+var globalUsage = `A simple command line utility to transform one line json log message to a human readable output for example:
 
 content test.json: { "level": "INFO", "timestamp": "2020-07-14T09:38:14.977Z", "message": "sample output" }
 cat test.json | json-log-to-human-readable
 tail -f test.json | json-log-to-human-readable
-kubectl logs -f -n default pod-name-1 | json-log-to-human-readable`,
+kubectl logs -f -n default pod-name-1 | json-log-to-human-readable`
+
+// rootCmd represents the base command when called without any subcommands
+var rootCmd = &cobra.Command{
+	Use:   "json-log-to-human-readable",
+	Short: "Transforms json log message to a human readable output",
+	Long:  globalUsage,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return runCommand()
 	},
-	Args:    NoArgs,
-	Version: version,
+	Args: NoArgs,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute() {
+func Execute(version string) {
+	rootCmd.Version = version
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
+		fmt.Println(globalUsage)
 		os.Exit(1)
 	}
 }

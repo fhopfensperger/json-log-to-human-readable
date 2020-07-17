@@ -17,6 +17,11 @@ package main
 
 import "github.com/fhopfensperger/json-log-to-human-readable/cmd"
 
+var (
+	// version is set during build
+	version = "v0.0.0"
+)
+
 func main() {
-	cmd.Execute()
+	cmd.Execute(version)
 }
