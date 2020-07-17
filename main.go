@@ -19,7 +19,7 @@ import "github.com/fhopfensperger/json-log-to-human-readable/cmd"
 
 var (
 	// version is set during build
-	version = "v0.0.0"
+	version = "0.0.0"
 )
 
 func main() {

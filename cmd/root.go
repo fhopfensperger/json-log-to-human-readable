@@ -72,7 +72,7 @@ func init() {
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	rootCmd.PersistentFlags().BoolVarP(&alternativeInput, "alternative", "a", false, "Spring Boot JSON input")
-	rootCmd.SetVersionTemplate(`{{printf "%s\n" .Version}}`)
+	rootCmd.SetVersionTemplate(`{{printf "v%s\n" .Version}}`)
 }
 
 // initConfig reads in config file and ENV variables if set.
