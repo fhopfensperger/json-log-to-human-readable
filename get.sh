@@ -110,13 +110,13 @@ downloadAndInstall() {
 
   downloadUrl=$(curl -s https://api.github.com/repos/fhopfensperger/json-log-to-human-readable/releases/latest | grep browser_download_url | grep ${OS}_${ARCH} | cut -d ":" -f 2,3 | cut -d " " -f 2,3 | tr -d \")
 
-  echo "downloading.."
+  echo "Downloading ${downloadUrl}..."
   curl -L -s ${downloadUrl} --output /tmp/${BINARY_NAME}.tar.gz
 
   tar xzf /tmp/${BINARY_NAME}.tar.gz
 
-  echo "copy ${BINARY_NAME} to ${INSTALL_DIR}"
-  # runAsRoot mv ${BINARY_NAME} ${INSTALL_DIR}/
+  echo "Copy ${BINARY_NAME} to ${INSTALL_DIR}"
+  runAsRoot mv ${BINARY_NAME} ${INSTALL_DIR}/
   runAsRoot chmod +x /usr/local/bin/${BINARY_NAME}
 
   location=$(which $BINARY_NAME)
@@ -125,6 +125,7 @@ downloadAndInstall() {
   version="$($BINARY_NAME -v)"
   echo "${BINARY_NAME} binary version: $version"
 
+  rm /tmp/${BINARY_NAME}.tar.gz
 }
 
 # fail_trap is executed if an error occurs.
