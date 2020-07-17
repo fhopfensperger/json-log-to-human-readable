@@ -12,7 +12,8 @@ curl https://raw.githubusercontent.com/fhopfensperger/json-log-to-human-readable
 
 ### Option 2 (manually)
 
-Either go to [Releases](https://github.com/fhopfensperger/json-log-to-human-readable/releases) download the latest release according to your processor architecture and operating system, then unarchive and copy it to the right location
+Go to [Releases](https://github.com/fhopfensperger/json-log-to-human-readable/releases) download the latest release according to your processor architecture and operating system, then unarchive and copy it to the right location
+
 ```bash
 tar xvfz json-log-to-human-readable_x.x.x_darwin_amd64.tar.gz
 cd json-log-to-human-readable_x.x.x_darwin_amd64
