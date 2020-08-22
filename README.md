@@ -1,4 +1,8 @@
 # json-log-to-human-readable
+![Go](https://github.com/fhopfensperger/json-log-to-human-readable/workflows/Go/badge.svg)
+[![Go Report Card](https://goreportcard.com/badge/github.com/fhopfensperger/json-log-to-human-readable)](https://goreportcard.com/report/github.com/fhopfensperger/json-log-to-human-readable)
+[![Release](https://img.shields.io/github/release/fhopfensperger/json-log-to-human-readable?style=flat-square)](https://github.com//fhopfensperger/json-log-to-human-readable/releases/latest)
+
 
 Convert JSON log messages from Quarkus JSON Logging (https://quarkus.io/guides/logging#json-logging) or from Spring Boot JSON logs to human readable output.
 

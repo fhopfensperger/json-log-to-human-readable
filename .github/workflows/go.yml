@@ -38,6 +38,9 @@ jobs:
           go build -v .
           go clean
 
+      - name: Trigger Go Report Card
+        run: curl -d "repo=github.com/fhopfensperger/json-log-to-human-readable" https://goreportcard.com/checks
+
         #  - name: Test
         #   run: go test -v .
       - name: Run GoReleaser
