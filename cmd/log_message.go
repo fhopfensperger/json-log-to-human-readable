@@ -1,6 +1,10 @@
 package cmd
 
-import "fmt"
+import (
+	"fmt"
+	"math"
+	"time"
+)
 
 type LogMessage struct {
 	Timestamp  string    `json:"timestamp"`
@@ -10,12 +14,23 @@ type LogMessage struct {
 	LoggerName string    `json:"loggerName"`
 }
 
-type AlternativeLogMessage struct {
+type SpringBootLogMessage struct {
 	Timestamp  string `json:"@timestamp"`
 	Level      string `json:"level"`
 	Message    string `json:"message"`
 	Exception  string `json:"stack_trace,omitempty"`
 	LoggerName string `json:"logger_name"`
+}
+
+type GoZapLogMessage struct {
+	Level      string  `json:"level"`
+	Timestamp  float64 `json:"ts"`
+	Logger     string  `json:"logger"`
+	Message    string  `json:"msg"`
+	Controller string  `json:"controller,omitempty"`
+	Request    string  `json:"request,omitempty"`
+	Error      string  `json:"error,omitempty"`
+	Stacktrace string  `json:"stacktrace,omitempty"`
 }
 
 type CommonLogMessage interface {
@@ -59,10 +74,21 @@ func (ex *Exception) print() {
 	}
 }
 
-func (alm *AlternativeLogMessage) print() {
+func (alm *SpringBootLogMessage) print() {
 	fmt.Printf("%v %v\t %v\t%v\n", alm.Level, alm.Timestamp, alm.LoggerName, alm.Message)
 	// log message contains an error error
 	if alm.Exception != "" {
 		fmt.Printf("Exception: %s", alm.Exception)
+	}
+}
+
+func (glm *GoZapLogMessage) print() {
+	sec, dec := math.Modf(glm.Timestamp)
+	timestamp := time.Unix(int64(sec), int64(dec*(1e9)))
+	fmt.Printf("%v %v\t %v\tmsg: %v\tcontroller: %v\t request: %v\n", glm.Level, timestamp, glm.Logger, glm.Message, glm.Controller, glm.Request)
+	// log message contains an error error
+	if glm.Error != "" {
+		fmt.Printf("error: %s", glm.Error)
+		fmt.Printf("stacktrace: %s\n", glm.Stacktrace)
 	}
 }

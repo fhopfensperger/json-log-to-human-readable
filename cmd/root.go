@@ -13,22 +13,25 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
 package cmd
 
 import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"io"
+	"os"
+
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"io"
-	"os"
 )
 
 var cfgFile string
-var alternativeInput bool
+var springBootInput bool
+var uberZapInput bool
 
 var globalUsage = `A simple command line utility to transform one line json log message to a human readable output for example:
 
@@ -47,7 +50,7 @@ var rootCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return runCommand()
 	},
-	Args: NoArgs,
+	Args: noArgs,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -71,7 +74,8 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	rootCmd.PersistentFlags().BoolVarP(&alternativeInput, "alternative", "a", false, "Spring Boot JSON input")
+	rootCmd.PersistentFlags().BoolVarP(&springBootInput, "springboot", "s", false, "Spring Boot JSON input")
+	rootCmd.PersistentFlags().BoolVarP(&uberZapInput, "zap", "z", false, "Uber zap JSON Input")
 	rootCmd.SetVersionTemplate(`{{printf "v%s\n" .Version}}`)
 }
 
@@ -101,7 +105,7 @@ func initConfig() {
 	}
 }
 
-func NoArgs(cmd *cobra.Command, args []string) error {
+func noArgs(cmd *cobra.Command, args []string) error {
 	if len(args) > 0 {
 		return errors.Errorf(
 			"%q accepts no arguments\n\nUsage:  %s",
@@ -129,8 +133,17 @@ func toHumanReadable(r io.Reader) error {
 	for scanner.Scan() {
 		byteValue := scanner.Bytes()
 
-		if alternativeInput {
-			var logMessage AlternativeLogMessage
+		if uberZapInput {
+			var logMessage GoZapLogMessage
+			err := json.Unmarshal(byteValue, &logMessage)
+			if err != nil {
+				fmt.Println(string(byteValue))
+				continue
+			}
+			logMessage.print()
+
+		} else if springBootInput {
+			var logMessage SpringBootLogMessage
 			err := json.Unmarshal(byteValue, &logMessage)
 			if err != nil {
 				fmt.Println(string(byteValue))
