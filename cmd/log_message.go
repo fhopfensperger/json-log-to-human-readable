@@ -6,14 +6,17 @@ import (
 	"time"
 )
 
+// LogMessage Quarkus Standard Log message type
 type LogMessage struct {
 	Timestamp  string    `json:"timestamp"`
 	Level      string    `json:"level"`
 	Message    string    `json:"message"`
 	Exception  Exception `json:"exception,omitempty"`
 	LoggerName string    `json:"loggerName"`
+	Tracing    Tracing   `json:"mdc"`
 }
 
+// SpringBootLogMessage Spring Boot Log message type
 type SpringBootLogMessage struct {
 	Timestamp  string `json:"@timestamp"`
 	Level      string `json:"level"`
@@ -22,6 +25,7 @@ type SpringBootLogMessage struct {
 	LoggerName string `json:"logger_name"`
 }
 
+// GoZapLogMessage Uber Zap log message type
 type GoZapLogMessage struct {
 	Level      string  `json:"level"`
 	Timestamp  float64 `json:"ts"`
@@ -33,30 +37,46 @@ type GoZapLogMessage struct {
 	Stacktrace string  `json:"stacktrace,omitempty"`
 }
 
+// CommonLogMessage interface
 type CommonLogMessage interface {
 	print()
 }
 
+// Exception for Java Log message
 type Exception struct {
-	RefId         int      `json:"refId"`
+	RefID         int      `json:"refId"`
 	ExceptionType string   `json:"exceptionType"`
 	Message       string   `json:"message"`
 	CausedBy      CausedBy `json:"causedBy"`
 	Frames        *[]Frame `json:"frames"`
 }
 
+// CausedBy Exception caused by filed
 type CausedBy struct {
 	Exception *Exception `json:"exception,omitempty"`
 }
 
+// Frame for Uber zap log message
 type Frame struct {
 	Class  string `json:"class"`
 	Method string `json:"method"`
 	Line   int    `json:"line"`
 }
 
+// Tracing Log message in Java based logging
+type Tracing struct {
+	TraceID string `json:"traceId"`
+	SpanID  string `json:"spanId"`
+	Sampled string `json:"sampled"`
+}
+
 func (lm *LogMessage) print() {
-	fmt.Printf("%v %v\t %v\t%v\n", lm.Level, lm.Timestamp, lm.LoggerName, lm.Message)
+	// log contains a tracing message
+	if lm.Tracing != (Tracing{}) {
+		fmt.Printf("%v %v\ttraceId=%v %v\t%v\n", lm.Level, lm.Timestamp, lm.Tracing.TraceID, lm.LoggerName, lm.Message)
+	} else {
+		fmt.Printf("%v %v\t %v\t%v\n", lm.Level, lm.Timestamp, lm.LoggerName, lm.Message)
+	}
 
 	// log message contains an error error
 	if lm.Exception != (Exception{}) {
