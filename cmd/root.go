@@ -124,12 +124,18 @@ func runCommand() error {
 }
 
 func isInputFromPipe() bool {
-	fileInfo, _ := os.Stdin.Stat()
+	fileInfo, err := os.Stdin.Stat()
+	if err != nil {
+		fmt.Println(err)
+	}
 	return fileInfo.Mode()&os.ModeCharDevice == 0
 }
 
 func toHumanReadable(r io.Reader) error {
 	scanner := bufio.NewScanner(bufio.NewReader(r))
+	buf := make([]byte, 0, 64*1024)
+	// increase max buffer size to process large log messages
+	scanner.Buffer(buf, 1024*1024)
 	for scanner.Scan() {
 		byteValue := scanner.Bytes()
 
@@ -161,6 +167,9 @@ func toHumanReadable(r io.Reader) error {
 			logMessage.print()
 		}
 
+	}
+	if err := scanner.Err(); err != nil {
+		return err
 	}
 	return nil
 }
