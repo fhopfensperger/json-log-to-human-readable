@@ -2,12 +2,13 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 	"math"
 	"time"
 )
 
-// LogMessage Quarkus Standard Log message type
-type LogMessage struct {
+// QuarkusLogMessage Quarkus Standard Log message type
+type QuarkusLogMessage struct {
 	Timestamp  string    `json:"timestamp"`
 	Level      string    `json:"level"`
 	Message    string    `json:"message"`
@@ -37,9 +38,17 @@ type GoZapLogMessage struct {
 	Stacktrace string  `json:"stacktrace,omitempty"`
 }
 
+// Dotnet Log message type
+type DotNetLogMessage struct {
+	Timestamp  string `json:"Timestamp"`
+	Level      string `json:"LogLevel"`
+	Message    string `json:"Message"`
+	LoggerName string `json:"Category"`
+}
+
 // CommonLogMessage interface
 type CommonLogMessage interface {
-	print()
+	transform(w io.Writer)
 }
 
 // Exception for Java Log message
@@ -70,45 +79,49 @@ type Tracing struct {
 	Sampled string `json:"sampled"`
 }
 
-func (lm *LogMessage) print() {
+func (lm *QuarkusLogMessage) transform(w io.Writer) {
 	// log contains a tracing message
 	if lm.Tracing != (Tracing{}) {
-		fmt.Printf("%v %v\ttraceId=%v %v\t%v\n", lm.Level, lm.Timestamp, lm.Tracing.TraceID, lm.LoggerName, lm.Message)
+		fmt.Fprintf(w, "%v %v\ttraceId=%v %v\t%v\n", lm.Level, lm.Timestamp, lm.Tracing.TraceID, lm.LoggerName, lm.Message)
 	} else {
-		fmt.Printf("%v %v\t %v\t%v\n", lm.Level, lm.Timestamp, lm.LoggerName, lm.Message)
+		fmt.Fprintf(w, "%v %v\t%v\t%v\n", lm.Level, lm.Timestamp, lm.LoggerName, lm.Message)
 	}
 
 	// log message contains an error error
 	if lm.Exception != (Exception{}) {
-		lm.Exception.print()
+		lm.Exception.transform(w)
 	}
 }
 
-func (ex *Exception) print() {
-	fmt.Printf("Caused by: %v. %s:\n", ex.ExceptionType, ex.Message)
+func (ex *Exception) transform(w io.Writer) {
+	fmt.Fprintf(w, "Caused by: %v. %s:\n", ex.ExceptionType, ex.Message)
 	for _, frame := range *ex.Frames {
-		fmt.Printf("\t at %s(%s:%v)\n", frame.Method, frame.Class, frame.Line)
+		fmt.Fprintf(w, "\t at %s(%s:%v)\n", frame.Method, frame.Class, frame.Line)
 	}
 	if ex.CausedBy != (CausedBy{}) {
-		ex.CausedBy.Exception.print()
+		ex.CausedBy.Exception.transform(w)
 	}
 }
 
-func (alm *SpringBootLogMessage) print() {
-	fmt.Printf("%v %v\t %v\t%v\n", alm.Level, alm.Timestamp, alm.LoggerName, alm.Message)
+func (alm *SpringBootLogMessage) transform(w io.Writer) {
+	fmt.Fprintf(w, "%v %v\t%v\t%v\n", alm.Level, alm.Timestamp, alm.LoggerName, alm.Message)
 	// log message contains an error error
 	if alm.Exception != "" {
-		fmt.Printf("Exception: %s", alm.Exception)
+		fmt.Fprintf(w, "Exception: %s", alm.Exception)
 	}
 }
 
-func (glm *GoZapLogMessage) print() {
+func (glm *GoZapLogMessage) transform(w io.Writer) {
 	sec, dec := math.Modf(glm.Timestamp)
-	timestamp := time.Unix(int64(sec), int64(dec*(1e9)))
-	fmt.Printf("%v %v\t %v\tmsg: %v\tcontroller: %v\t request: %v\n", glm.Level, timestamp, glm.Logger, glm.Message, glm.Controller, glm.Request)
+	timestamp := time.Unix(int64(sec), int64(dec*(1e9))).UTC()
+	fmt.Fprintf(w, "%v %v\t%v\tmsg: %v\tcontroller: %v\trequest: %v\n", glm.Level, timestamp, glm.Logger, glm.Message, glm.Controller, glm.Request)
 	// log message contains an error error
 	if glm.Error != "" {
-		fmt.Printf("error: %s", glm.Error)
-		fmt.Printf("stacktrace: %s\n", glm.Stacktrace)
+		fmt.Fprintf(w, "error: %s", glm.Error)
+		fmt.Fprintf(w, "stacktrace: %s\n", glm.Stacktrace)
 	}
+}
+
+func (dnlm *DotNetLogMessage) transform(w io.Writer) {
+	fmt.Fprintf(w, "%v %v\t%v\t%v\n", dnlm.Level, dnlm.Timestamp, dnlm.LoggerName, dnlm.Message)
 }

@@ -23,15 +23,13 @@ import (
 	"io"
 	"os"
 
-	homedir "github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
-var cfgFile string
 var springBootInput bool
 var uberZapInput bool
+var dotnetInput bool
 
 var globalUsage = `A simple command line utility to transform one line json log message to a human readable output for example:
 
@@ -64,45 +62,10 @@ func Execute(version string) {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
-
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
-
-	//rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.json-log-to-human-readable.yaml)")
-
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
+	rootCmd.PersistentFlags().BoolVarP(&dotnetInput, "dotnet", "d", false, ".NET JSON input")
 	rootCmd.PersistentFlags().BoolVarP(&springBootInput, "springboot", "s", false, "Spring Boot JSON input")
 	rootCmd.PersistentFlags().BoolVarP(&uberZapInput, "zap", "z", false, "Uber zap JSON Input")
 	rootCmd.SetVersionTemplate(`{{printf "v%s\n" .Version}}`)
-}
-
-// initConfig reads in config file and ENV variables if set.
-func initConfig() {
-	if cfgFile != "" {
-		// Use config file from the flag.
-		viper.SetConfigFile(cfgFile)
-	} else {
-		// Find home directory.
-		home, err := homedir.Dir()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-
-		// Search config in home directory with name ".json-log-to-human-readable" (without extension).
-		viper.AddConfigPath(home)
-		viper.SetConfigName(".json-log-to-human-readable")
-	}
-
-	viper.AutomaticEnv() // read in environment variables that match
-
-	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
-	}
 }
 
 func noArgs(cmd *cobra.Command, args []string) error {
@@ -118,7 +81,7 @@ func noArgs(cmd *cobra.Command, args []string) error {
 
 func runCommand() error {
 	if isInputFromPipe() {
-		return toHumanReadable(os.Stdin)
+		return toHumanReadable(os.Stdin, os.Stdout)
 	}
 	return errors.New("Input must be pipe")
 }
@@ -131,40 +94,48 @@ func isInputFromPipe() bool {
 	return fileInfo.Mode()&os.ModeCharDevice == 0
 }
 
-func toHumanReadable(r io.Reader) error {
+func toHumanReadable(r io.Reader, w io.Writer) error {
 	scanner := bufio.NewScanner(bufio.NewReader(r))
 	buf := make([]byte, 0, 64*1024)
 	// increase max buffer size to process large log messages
 	scanner.Buffer(buf, 1024*1024)
 	for scanner.Scan() {
 		byteValue := scanner.Bytes()
-
 		if uberZapInput {
 			var logMessage GoZapLogMessage
 			err := json.Unmarshal(byteValue, &logMessage)
 			if err != nil {
-				fmt.Println(string(byteValue))
+				fmt.Fprintln(w, string(byteValue))
 				continue
 			}
-			logMessage.print()
+			logMessage.transform(w)
 
 		} else if springBootInput {
 			var logMessage SpringBootLogMessage
 			err := json.Unmarshal(byteValue, &logMessage)
 			if err != nil {
-				fmt.Println(string(byteValue))
+				fmt.Fprintln(w, string(byteValue))
 				continue
 			}
-			logMessage.print()
+			logMessage.transform(w)
 
-		} else {
-			var logMessage LogMessage
+		} else if dotnetInput {
+			var logMessage DotNetLogMessage
 			err := json.Unmarshal(byteValue, &logMessage)
 			if err != nil {
-				fmt.Println(string(byteValue))
+				fmt.Fprintln(w, string(byteValue))
 				continue
 			}
-			logMessage.print()
+			logMessage.transform(w)
+
+		} else {
+			var logMessage QuarkusLogMessage
+			err := json.Unmarshal(byteValue, &logMessage)
+			if err != nil {
+				fmt.Fprintln(w, string(byteValue))
+				continue
+			}
+			logMessage.transform(w)
 		}
 
 	}
