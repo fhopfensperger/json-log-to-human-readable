@@ -1,29 +1,30 @@
 # json-log-to-human-readable
 ![Go](https://github.com/fhopfensperger/json-log-to-human-readable/workflows/Go/badge.svg)
 [![Go Report Card](https://goreportcard.com/badge/github.com/fhopfensperger/json-log-to-human-readable)](https://goreportcard.com/report/github.com/fhopfensperger/json-log-to-human-readable)
+[![Coverage Status](https://coveralls.io/repos/github/fhopfensperger/json-log-to-human-readable/badge.svg?branch=master)](https://coveralls.io/github/fhopfensperger/json-log-to-human-readable?branch=master)
 [![Release](https://img.shields.io/github/release/fhopfensperger/json-log-to-human-readable?style=flat-square)](https://github.com//fhopfensperger/json-log-to-human-readable/releases/latest)
 
 
-Convert JSON log messages from Quarkus JSON Logging (https://quarkus.io/guides/logging#json-logging) or from Spring Boot JSON logs to human readable output.
+Convert JSON log messages to a human-readable format.
 
-## Installation
+The following formats are supported:
 
-### Option 1 (script)
+- [Quarkus JSON Logging](https://quarkus.io/guides/logging#json-logging)
+- [Spring Boot JSON Logging](https://www.baeldung.com/java-log-json-output)
+- [Uber Zap](https://github.com/uber-go/zap)
+- [.NET Core](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/logging/?view=aspnetcore-5.0)
 
-```bash
-curl https://raw.githubusercontent.com/fhopfensperger/json-log-to-human-readable/master/get.sh | bash
+```
+Flags:
+  -d, --dotnet       .NET JSON input
+  -h, --help         help for json-log-to-human-readable
+  -s, --springboot   Spring Boot JSON input
+  -v, --version      version for json-log-to-human-readable
+  -z, --zap          Uber zap JSON Input
+
 ```
 
-### Option 2 (manually)
 
-Go to [Releases](https://github.com/fhopfensperger/json-log-to-human-readable/releases) download the latest release according to your processor architecture and operating system, then unarchive and copy it to the right location
-
-```bash
-tar xvfz json-log-to-human-readable_x.x.x_darwin_amd64.tar.gz
-cd json-log-to-human-readable_x.x.x_darwin_amd64
-chmod +x json-log-to-human-readable
-sudo mv json-log-to-human-readable /usr/local/bin/
-```
 
 ## Usage Examples:
 
@@ -81,5 +82,23 @@ k8s.io/apimachinery/pkg/util/wait.JitterUntil
         /Users/zroubali/go/pkg/mod/k8s.io/apimachinery@v0.0.0-20190404173353-6a84e37a896d/pkg/util/wait/wait.go:153
 k8s.io/apimachinery/pkg/util/wait.Until
         /Users/zroubali/go/pkg/mod/k8s.io/apimachinery@v0.0.0-20190404173353-6a84e37a896d/pkg/util/wait/wait.go:88
+```
 
+## Installation
+
+### Option 1 (script)
+
+```bash
+curl https://raw.githubusercontent.com/fhopfensperger/json-log-to-human-readable/master/get.sh | bash
+```
+
+### Option 2 (manually)
+
+Go to [Releases](https://github.com/fhopfensperger/json-log-to-human-readable/releases) download the latest release according to your processor architecture and operating system, then unarchive and copy it to the right location
+
+```bash
+tar xvfz json-log-to-human-readable_x.x.x_darwin_amd64.tar.gz
+cd json-log-to-human-readable_x.x.x_darwin_amd64
+chmod +x json-log-to-human-readable
+sudo mv json-log-to-human-readable /usr/local/bin/
 ```
