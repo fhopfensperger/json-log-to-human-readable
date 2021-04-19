@@ -3,6 +3,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/fhopfensperger/json-log-to-human-readable)](https://goreportcard.com/report/github.com/fhopfensperger/json-log-to-human-readable)
 [![Coverage Status](https://coveralls.io/repos/github/fhopfensperger/json-log-to-human-readable/badge.svg?branch=master)](https://coveralls.io/github/fhopfensperger/json-log-to-human-readable?branch=master)
 [![Release](https://img.shields.io/github/release/fhopfensperger/json-log-to-human-readable?style=flat-square)](https://github.com//fhopfensperger/json-log-to-human-readable/releases/latest)
+[![Docker Repository on Quay](https://img.shields.io/badge/Quay-repository-sucess "Docker Repository on Quay")](https://quay.io/repository/fhopfensperger/json-log-to-human-readable)
 
 
 Convert JSON log messages to a human-readable format.
@@ -84,15 +85,15 @@ k8s.io/apimachinery/pkg/util/wait.Until
         /Users/zroubali/go/pkg/mod/k8s.io/apimachinery@v0.0.0-20190404173353-6a84e37a896d/pkg/util/wait/wait.go:88
 ```
 
-## Installation
+# Installation
 
-### Option 1 (script)
+## Option 1 (script)
 
 ```bash
 curl https://raw.githubusercontent.com/fhopfensperger/json-log-to-human-readable/master/get.sh | bash
 ```
 
-### Option 2 (manually)
+## Option 2 (manually)
 
 Go to [Releases](https://github.com/fhopfensperger/json-log-to-human-readable/releases) download the latest release according to your processor architecture and operating system, then unarchive and copy it to the right location
 
@@ -101,4 +102,11 @@ tar xvfz json-log-to-human-readable_x.x.x_darwin_amd64.tar.gz
 cd json-log-to-human-readable_x.x.x_darwin_amd64
 chmod +x json-log-to-human-readable
 sudo mv json-log-to-human-readable /usr/local/bin/
+```
+
+## Run as container
+
+Besides installing the binary on the local computer, you have the option to run the program as a container
+```bash
+kubectl logs -f pod1 | docker run -i quay.io/fhopfensperger/json-log-to-human-readable
 ```
