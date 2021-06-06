@@ -18,6 +18,7 @@ func Test_noArgs(t *testing.T) {
 		cmd  *cobra.Command
 		args []string
 	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -40,6 +41,7 @@ func Test_noArgs(t *testing.T) {
 			wantErr: false,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if err := noArgs(tt.args.cmd, tt.args.args); (err != nil) != tt.wantErr {
@@ -95,6 +97,7 @@ func TestExecute(t *testing.T) {
 	cmd.SetOut(b)
 	cmd.SetArgs([]string{"--version"})
 	Execute("0.0.0")
+
 	out, _ := ioutil.ReadAll(b)
 	assert.Equal(t, "v0.0.0\n", string(out))
 }
@@ -108,6 +111,7 @@ func Test_toHumanReadable(t *testing.T) {
 	type args struct {
 		r io.Reader
 	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -133,7 +137,7 @@ func Test_toHumanReadable(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name:    "uber zap", //could not decode
+			name:    "uber zap", // could not decode
 			args:    args{strings.NewReader("123")},
 			wantW:   "123\n",
 			wantErr: false,
@@ -145,7 +149,7 @@ func Test_toHumanReadable(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name:    "spring boot", //could not decode
+			name:    "spring boot", // could not decode
 			args:    args{strings.NewReader("123")},
 			wantW:   "123\n",
 			wantErr: false,
@@ -157,12 +161,13 @@ func Test_toHumanReadable(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name:    "dotnet", //could not decode
+			name:    "dotnet", // could not decode
 			args:    args{strings.NewReader("123")},
 			wantW:   "123\n",
 			wantErr: false,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			switch tt.name {

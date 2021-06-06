@@ -38,7 +38,7 @@ type GoZapLogMessage struct {
 	Stacktrace string  `json:"stacktrace,omitempty"`
 }
 
-// Dotnet Log message type
+// DotNetLogMessage type
 type DotNetLogMessage struct {
 	Timestamp  string `json:"Timestamp"`
 	Level      string `json:"LogLevel"`
@@ -95,9 +95,11 @@ func (lm *QuarkusLogMessage) transform(w io.Writer) {
 
 func (ex *Exception) transform(w io.Writer) {
 	fmt.Fprintf(w, "Caused by: %v. %s:\n", ex.ExceptionType, ex.Message)
+
 	for _, frame := range *ex.Frames {
 		fmt.Fprintf(w, "\t at %s(%s:%v)\n", frame.Method, frame.Class, frame.Line)
 	}
+
 	if ex.CausedBy != (CausedBy{}) {
 		ex.CausedBy.Exception.transform(w)
 	}
