@@ -76,6 +76,7 @@ func noArgs(cmd *cobra.Command, args []string) error {
 			cmd.UseLine(),
 		)
 	}
+
 	return nil
 }
 
@@ -83,6 +84,7 @@ func runCommand() error {
 	if isInputFromPipe() {
 		return toHumanReadable(os.Stdin, os.Stdout)
 	}
+
 	return errors.New("Input must be pipe")
 }
 
@@ -91,56 +93,62 @@ func isInputFromPipe() bool {
 	if err != nil {
 		fmt.Println(err)
 	}
+
 	return fileInfo.Mode()&os.ModeCharDevice == 0
 }
 
 func toHumanReadable(r io.Reader, w io.Writer) error {
 	scanner := bufio.NewScanner(bufio.NewReader(r))
-	buf := make([]byte, 0, 64*1024)
+	buf := make([]byte, 0, 64*1024) //nolint:gomnd // only used once
 	// increase max buffer size to process large log messages
-	scanner.Buffer(buf, 1024*1024)
+	scanner.Buffer(buf, 1024*1024) //nolint:gomnd // only used once
+
 	for scanner.Scan() {
 		byteValue := scanner.Bytes()
-		if uberZapInput {
+
+		switch {
+		case uberZapInput:
 			var logMessage GoZapLogMessage
+
 			err := json.Unmarshal(byteValue, &logMessage)
 			if err != nil {
 				fmt.Fprintln(w, string(byteValue))
 				continue
 			}
-			logMessage.transform(w)
 
-		} else if springBootInput {
+			logMessage.transform(w)
+		case springBootInput:
 			var logMessage SpringBootLogMessage
+
 			err := json.Unmarshal(byteValue, &logMessage)
 			if err != nil {
 				fmt.Fprintln(w, string(byteValue))
 				continue
 			}
-			logMessage.transform(w)
 
-		} else if dotnetInput {
+			logMessage.transform(w)
+		case dotnetInput:
 			var logMessage DotNetLogMessage
-			err := json.Unmarshal(byteValue, &logMessage)
-			if err != nil {
-				fmt.Fprintln(w, string(byteValue))
-				continue
-			}
-			logMessage.transform(w)
 
-		} else {
-			var logMessage QuarkusLogMessage
 			err := json.Unmarshal(byteValue, &logMessage)
 			if err != nil {
 				fmt.Fprintln(w, string(byteValue))
 				continue
 			}
+
+			logMessage.transform(w)
+		default:
+			var logMessage QuarkusLogMessage
+
+			err := json.Unmarshal(byteValue, &logMessage)
+			if err != nil {
+				fmt.Fprintln(w, string(byteValue))
+				continue
+			}
+
 			logMessage.transform(w)
 		}
+	}
 
-	}
-	if err := scanner.Err(); err != nil {
-		return err
-	}
-	return nil
+	return scanner.Err()
 }
