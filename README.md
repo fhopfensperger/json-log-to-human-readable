@@ -87,13 +87,19 @@ k8s.io/apimachinery/pkg/util/wait.Until
 
 # Installation
 
-## Option 1 (script)
+## Homebrew
+
+```bash
+brew install fhopfensperger/tap/json-log-to-human-readable
+```
+
+## Script
 
 ```bash
 curl https://raw.githubusercontent.com/fhopfensperger/json-log-to-human-readable/master/get.sh | bash
 ```
 
-## Option 2 (manually)
+## Manually
 
 Go to [Releases](https://github.com/fhopfensperger/json-log-to-human-readable/releases) download the latest release according to your processor architecture and operating system, then unarchive and copy it to the right location
 

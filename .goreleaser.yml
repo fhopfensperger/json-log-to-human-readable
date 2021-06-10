@@ -14,3 +14,21 @@ builds:
       - amd64
       - arm
       - arm64
+
+brews:
+  - tap:
+      owner: fhopfensperger
+      name: homebrew-tap
+    folder: Formula
+    homepage: https://fhopfensperger.github.io
+    description: Transforms json log into human readable output
+    license: Apache 2.0
+    test: |
+      system "#{bin}/json-log-to-human-readable -v"
+    dependencies:
+      - name: go
+        type: optional
+      - name: git
+        type: optional
+    install: |-
+      bin.install "json-log-to-human-readable"
