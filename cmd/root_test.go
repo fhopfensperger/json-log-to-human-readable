@@ -3,7 +3,6 @@ package cmd
 import (
 	"bytes"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -98,7 +97,7 @@ func TestExecute(t *testing.T) {
 	cmd.SetArgs([]string{"--version"})
 	Execute("0.0.0")
 
-	out, _ := ioutil.ReadAll(b)
+	out, _ := io.ReadAll(b)
 	assert.Equal(t, "v0.0.0\n", string(out))
 }
 
