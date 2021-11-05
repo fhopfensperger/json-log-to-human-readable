@@ -59,6 +59,7 @@ jobs:
         run: curl -d "repo=github.com/fhopfensperger/json-log-to-human-readable" https://goreportcard.com/checks
 
       - name: Clean directory
+        if: startsWith(github.ref, 'refs/master')
         run: rm coverage.lcov
 
       - name: Run GoReleaser
