@@ -1,60 +1,40 @@
+run:
+  deadline: 13m
+  skip-dirs:
+  - .git
+  - .tool
+  - vendor
+  - verify
+
 linters-settings:
-  errcheck:
-    check-type-assertions: true
-  goconst:
-    min-len: 2
-    min-occurrences: 3
-  gocritic:
-    enabled-tags:
-      - diagnostic
-      - experimental
-      - opinionated
-      - performance
-      - style
+  dupl:
+    threshold: 100
+  gocyclo:
+    min-complexity: 50
   govet:
-    check-shadowing: true
-  nolintlint:
-    require-explanation: true
-    require-specific: true
+    enable:
+      - nilness
 
 linters:
-  disable-all: true
   enable:
-    - bodyclose
-    - deadcode
-    - depguard
-    - dogsled
-    - dupl
-    - errcheck
-    - exportloopref
-    - exhaustive
-    - goconst
-    - gocritic
-    - gofmt
-    - goimports
-    - gomnd
-    - gocyclo
-    - gosec
-    - gosimple
-    - govet
-    - ineffassign
-    - misspell
-    - nolintlint
-    - nakedret
-    - prealloc
-    - predeclared
-    - revive
-    - staticcheck
-    - structcheck
-    - stylecheck
-    - thelper
-    - tparallel
-    - typecheck
-    - unconvert
-    - unparam
-    - varcheck
-    - whitespace
-    - wsl
+  - govet
+  - unused
+  - misspell
+  - ineffassign
+  - staticcheck
+  - gosimple
+  - exportloopref
+  disable-all: true
 
-run:
-  issues-exit-code: 1
+issues:
+  exclude-rules:
+  - linters:
+    - golint
+    text: ".*should not use dot dot imports"
+  - linters:
+    - staticcheck
+    text: "SA1019: fakectrlruntimeclient.NewFakeClient is deprecated"
+  - linters:
+    - staticcheck
+    # TODO: Is this really supposed to be deprecated? Ref https://github.com/kubernetes/test-infra/issues/14875
+    text: "SA1019: t.*.TrustedOrg is deprecated: TrustedOrg functionality is deprecated and will be removed in January 2020"
