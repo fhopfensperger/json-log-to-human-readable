@@ -1,4 +1,4 @@
-FROM golang:1.21.4 as goBuilder
+FROM golang:1.21.6 as goBuilder
 
 USER root
 WORKDIR /work
