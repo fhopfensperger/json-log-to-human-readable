@@ -1,3 +1,4 @@
+version: 2
 builds:
   - # GOOS list to build for.
     # For more info refer to: https://golang.org/doc/install/source#environment
@@ -16,10 +17,11 @@ builds:
       - arm64
 
 brews:
-  - tap:
+  - name: json-log-to-human-readable
+    repository:
       owner: fhopfensperger
       name: homebrew-tap
-    folder: Formula
+    directory: Formula
     homepage: https://fhopfensperger.github.io
     description: Transforms json log into human readable output
     license: Apache 2.0
